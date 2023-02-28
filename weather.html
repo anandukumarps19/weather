@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+        <link rel="stylesheet" href="weather.css">
+</head>
+<body style="background-image:url(weather.jpg); background-repeat: no-repeat; background-size: cover;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="text-black mt-5 "><b>Weather</b></h1>
+                <div class="mt-5 col-lg-5" id="rest">
+
+                </div>
+
+            </div>
+            <div class="col-lg-4">
+                <div class="border mt-5 p-3 bg-secondary">
+                    <input id="Cinput" class="w-100 mt-3" type="text" placeholder="Enter Your location">
+                    <button type="button" onclick="search()" class="btn btn-primary m-3 btn btn-center">Search</button>
+                </div>
+                
+                <div class="mt-2" id="result">
+                        
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script>
+    async function search(){
+        let searchlocation = Cinput.value
+        if(!searchlocation){
+            alert('Enter the location')
+        }else{
+        
+            const data = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${searchlocation}&appid=8ac5c4d57ba6a4b3dfcf622700447b1e`)
+            console.log(data);
+            data.json().then(
+                output=>display(output)
+            )
+        }
+    }
+
+    function display(output){
+        let weatherdetails = output
+        let Cname = weatherdetails.name
+        let Ccountry = weatherdetails.sys.country
+        let Chumidity = weatherdetails.main.humidity
+        let Cwind = weatherdetails.wind.speed
+        let Cpressure = weatherdetails.main.pressure
+        let Csymbol = weatherdetails.weather[0].icon
+        let Crise =  weatherdetails.sys.sunrise + weatherdetails.timezone
+        let Cset = weatherdetails.sys.sunset + weatherdetails.timezone
+        let date = new Date()
+        let hrs = date.getHours()
+        let min = date.getMinutes()
+        let sec = date.getSeconds()
+        let Time = `${date} <br>
+        ${hrs} : ${min} : ${sec}`
+        html_data = `
+        <div class="card bg-secondary mt-2 p-2 mb-2">
+            <div class="card-body ">
+                <div class="d-flex">
+                    <h6 class="flex-grow-1"> ${Cname},${Ccountry}</h6>
+                    <h5 class="flex-grow-2">${weatherdetails.weather[0].main}</h5>
+                </div>
+                <div class="d-flex flex-column text-center mt-5 mb-4">
+                    <h6 class="display-4 mb-0">${(weatherdetails.main.temp - 272.15).toFixed(2)}°C </h6>
+                    <span class="small">Feels like ${(weatherdetails.main.feels_like - 272.15).toFixed(2)}°C </span>
+                </div> 
+                <div class="d-flex align-item-center"> 
+                    <div class="flex-grow-1" style="font-size:1rem;"> 
+                        <label>Humidity</label>                 
+                        <h5 class="card-title">${Chumidity}%</h5>
+                        <label>Wind</label> 
+                        <h5 class="card-title">${Cwind}kmph</h5>
+                        <label>Pressure</label> 
+                        <h5 class="card-title">${Cpressure} </h5>
+                        <br>
+                        <label>Last Updated : <b>${hrs}:${min}:${sec}</b></label>
+            </div>
+        </div>`
+        first_html = `
+        <div>
+            <b>
+                <div class="w-100 h-100">
+                    <img src="https://openweathermap.org/img/w/${Csymbol}.png"
+                </div>
+            <h3 class="">${Cname}</h3>
+            <h1 class="">${(weatherdetails.main.temp -272.15).toFixed(2)}°C</h1>
+            <span class="small">Feels like ${(weatherdetails.main.feels_like - 272.15).toFixed(2)}°C </span></b>
+            <p>${Time}</p>
+        </div>
+        `
+
+        result.innerHTML = html_data
+        rest.innerHTML = first_html
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+</html>
